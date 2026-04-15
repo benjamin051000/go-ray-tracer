@@ -2,7 +2,6 @@ package main
 
 import (
 	"image"
-	"image/color"
 	"image/png"
 	"log"
 	"os"
@@ -18,9 +17,9 @@ func main() {
 			g := float64(row) / float64(h-1)
 			b := float64(0)
 
-			const scale float64 = 255.999
 
-			img.Set(col, row, color.RGBA{uint8(r * scale), uint8(g * scale), uint8(b * scale), 255})
+			c := Color{r, g, b}
+			c.Write(col, row, img)
 		}
 	}
 
