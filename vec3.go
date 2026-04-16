@@ -8,23 +8,47 @@ type Vec3 struct {
 
 type Point3 Vec3
 
-func Add(l, r Vec3) Vec3 {
-	return Vec3{l.x + r.x, l.y + r.y, l.z + r.z}
+func (v Vec3) Add(vecs ...Vec3) Vec3 {
+	for _, vec := range vecs {
+		v.x += vec.x
+		v.y += vec.y
+		v.z += vec.z
+	}
+
+	return v
 }
 
-func Sub(l, r Vec3) Vec3 {
-	return Vec3{l.x - r.x, l.y - r.y, l.z - r.z}
+func (v Vec3) Sub(vecs ...Vec3) Vec3 {
+	for _, vec := range vecs {
+		v.x -= vec.x
+		v.y -= vec.y
+		v.z -= vec.z
+	}
+
+	return v
 }
 
-func Mul(l, r Vec3) Vec3 {
-	return Vec3{l.x * r.x, l.y * r.y, l.z * r.z}
+func (v Vec3) Mul(vecs ...Vec3) Vec3 {
+	for _, vec := range vecs {
+		v.x *= vec.x
+		v.y *= vec.y
+		v.z *= vec.z
+	}
+
+	return v
 }
 
-func Div(l, r Vec3) Vec3 {
-	return Vec3{l.x / r.x, l.y / r.y, l.z / r.z}
+func (v Vec3) Div(vecs ...Vec3) Vec3 {
+	for _, vec := range vecs {
+		v.x /= vec.x
+		v.y /= vec.y
+		v.z /= vec.z
+	}
+
+	return v
 }
 
-func Scale(v Vec3, t float64) Vec3 {
+func (v Vec3) Scale(t float64) Vec3 {
 	return Vec3{v.x * t, v.y * t, v.z * t}
 }
 
@@ -37,17 +61,17 @@ func (v Vec3) Len() float64 {
 }
 
 // Whoa, this is the same as LenSquared...
-func Dot(l, r Vec3) float64 {
-	return l.x*r.x + l.y*r.y + l.z*r.z
+func (v Vec3) Dot(vec Vec3) float64 {
+	return v.x*vec.x + v.y*vec.y + v.z*vec.z
 }
 
-func Cross(u, v Vec3) Vec3 {
-	return Vec3{u.y*v.z - u.z*v.y,
-		u.z*v.x - u.x*v.z,
-		u.x*v.y - u.y*v.x}
+func (v Vec3) Cross(other Vec3) Vec3 {
+	return Vec3{v.y*other.z - v.z*other.y,
+		v.z*other.x - v.x*other.z,
+		v.x*other.y - v.y*other.x}
 }
 
 func (v Vec3) UnitVec() Vec3 {
 	l := v.Len()
-	return Div(v, Vec3{l, l, l})
+	return v.Div(Vec3{l, l, l})
 }

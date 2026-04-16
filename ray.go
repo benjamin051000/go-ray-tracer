@@ -6,5 +6,5 @@ type Ray struct {
 }
 
 func (r Ray) At(t float64) Point3 {
-	return Point3(Add(Vec3(r.origin), Scale(r.dir, t)))
+	return Point3(Vec3(r.origin).Add(r.dir.Scale(t)))
 }

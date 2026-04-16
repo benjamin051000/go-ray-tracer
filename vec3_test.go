@@ -5,7 +5,7 @@ import "testing"
 func TestVec3Mul(t *testing.T) {
 	a := Vec3{1, 2, 3}
 	b := Vec3{4, 5, 6}
-	c := Mul(a, b)
+	c := a.Mul(b)
 
 	correct := Vec3{4, 10, 18}
 
@@ -17,10 +17,16 @@ func TestVec3Mul(t *testing.T) {
 func TestVec3Add(t *testing.T) {
 	a := Vec3{1, 2, 3}
 	b := Vec3{4, 5, 6}
-	c := Add(a, b)
+	c := a.Add(b)
 
 	correct := Vec3{5, 7, 9}
 
+	if c.x != correct.x || c.y != correct.y || c.z != correct.z {
+		t.Error()
+	}
+
+	c = a.Add(b, b)
+	correct = Vec3{9, 12, 15}
 	if c.x != correct.x || c.y != correct.y || c.z != correct.z {
 		t.Error()
 	}
@@ -29,7 +35,7 @@ func TestVec3Add(t *testing.T) {
 func TestVec3Sub(t *testing.T) {
 	a := Vec3{1, 2, 3}
 	b := Vec3{4, 5, 6}
-	c := Sub(a, b)
+	c := a.Sub(b)
 
 	correct := Vec3{-3, -3, -3}
 
@@ -41,7 +47,7 @@ func TestVec3Sub(t *testing.T) {
 func TestVec3Div(t *testing.T) {
 	a := Vec3{1, 2, 3}
 	b := Vec3{4, 5, 6}
-	c := Div(a, b)
+	c := a.Div(b)
 
 	correct := Vec3{0.25, 0.4, 0.5}
 
@@ -52,7 +58,7 @@ func TestVec3Div(t *testing.T) {
 
 func TestVec3Scale(t *testing.T) {
 	a := Vec3{1, 2, 3}
-	a.Scale(2)
+	a = a.Scale(2)
 
 	correct := Vec3{2, 4, 6}
 
