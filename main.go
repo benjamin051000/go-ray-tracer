@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"image/png"
 	"log"
@@ -74,7 +75,9 @@ func main() {
 
 			pixel_color.Write(col, row, img)
 		}
+		fmt.Printf("%d/%d\n", row, img_h)
 	}
+	fmt.Printf("Image dim. %dx%d (%d pixels)\n", img_w, img_h, img_w*img_h)
 
 	file, err := os.Create("out.png")
 	if err != nil {
