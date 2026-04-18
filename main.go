@@ -9,11 +9,10 @@ import (
 	"os"
 )
 
-func RayColor(r Ray) Color {
-	t := HitSphere(Point3{0, 0, -1}, 0.5, r)
-	if t > 0 {
-		n := Vec3(r.At(t)).Sub(Vec3{0, 0, -1}).UnitVec()
-		return Color(n.Add(Vec3{1, 1, 1}).Scale(0.5))
+func RayColor(r Ray, world Hittable) Color {
+	var rec HitRecord
+	if world.Hit(r, 0, math.Inf(1), &rec) {
+		return Color(rec.normal.Add(Vec3{1, 1, 1}).Scale(0.5))
 	}
 
 	// Background
@@ -30,6 +29,11 @@ func main() {
 	img_w := 400
 	// Calculate img_h automatically (must be >=1)
 	img_h := max(1, int(float64(img_w)/aspect_ratio))
+
+	// World
+	var world HittableList
+	world.objects = append(world.objects, Sphere{center: Point3{0, 0, -1}, radius: 0.5})
+	world.objects = append(world.objects, Sphere{center: Point3{0, -100.5, -1}, radius: 100})
 
 	// Camera
 
@@ -57,7 +61,7 @@ func main() {
 			ray_direction := pixel_center.Sub(Vec3(camera_center)) // technically doesn't need to be a unit vector
 
 			r := Ray{camera_center, ray_direction}
-			pixel_color := RayColor(r)
+			pixel_color := RayColor(r, world)
 
 			pixel_color.Write(col, row, img)
 		}

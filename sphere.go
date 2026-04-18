@@ -30,7 +30,7 @@ func (s Sphere) Hit(r Ray, r_tmin, r_tmax float64, rec *HitRecord) bool {
 
 	rec.t = root
 	rec.p = r.At(rec.t)
-	outward_normal := Vec3(rec.p).Sub(Vec3(s.center)).Scale(1/s.radius)
+	outward_normal := Vec3(rec.p).Sub(Vec3(s.center)).Scale(1 / s.radius)
 	rec.SetFaceNormal(r, outward_normal)
 
 	return true

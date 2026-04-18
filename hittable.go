@@ -1,9 +1,9 @@
 package main
 
 type HitRecord struct {
-	p      Point3
-	normal Vec3
-	t      float64
+	p          Point3
+	normal     Vec3
+	t          float64
 	front_face bool
 }
 
