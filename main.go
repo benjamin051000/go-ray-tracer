@@ -7,7 +7,22 @@ import (
 	"os"
 )
 
+func HitSphere(center Point3, radius float64, ray Ray) bool {
+	oc := Vec3(center).Sub(Vec3(ray.origin))
+	a := ray.dir.Dot(ray.dir)
+	b := Vec3(ray.dir).Dot(oc) * -2.0
+	c := oc.Dot(oc) - radius*radius
+	discriminant := b*b - 4*a*c
+	return discriminant >= 0
+}
+
 func RayColor(r Ray) Color {
+	sphere := Point3{0, 0, -1}
+	if HitSphere(sphere, 0.5, r) {
+		return Color{1, 0, 0}
+	}
+
+	// Background
 	unit_dir := r.dir.UnitVec()
 	a := 0.5 * (unit_dir.y + 1.0)
 	return Color(Vec3{1.0, 1.0, 1.0}.Scale(1.0 - a).Add(Vec3{0.5, 0.7, 1.0}.Scale(a)))
