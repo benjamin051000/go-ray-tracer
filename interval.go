@@ -21,3 +21,13 @@ type interval struct {
 //
 // var Empty = interval{math.Inf(1), math.Inf(-1)}
 // var Universe = interval{math.Inf(-1), math.Inf(1)}
+
+func (i interval) Clamp(x float64) float64 {
+	if x < i.min {
+		return i.min
+	}
+	if x > i.max {
+		return i.max
+	}
+	return x
+}
