@@ -4,22 +4,29 @@ import (
 	"image"
 	"image/png"
 	"log"
+	"math"
 	"os"
 )
 
-func HitSphere(center Point3, radius float64, ray Ray) bool {
+func HitSphere(center Point3, radius float64, ray Ray) float64 {
 	oc := Vec3(center).Sub(Vec3(ray.origin))
 	a := ray.dir.Dot(ray.dir)
 	b := Vec3(ray.dir).Dot(oc) * -2.0
 	c := oc.Dot(oc) - radius*radius
 	discriminant := b*b - 4*a*c
-	return discriminant >= 0
+
+	if discriminant < 0 {
+		return -1.0
+	}
+
+	return (-b - math.Sqrt(discriminant)) / (2.0 * a)
 }
 
 func RayColor(r Ray) Color {
-	sphere := Point3{0, 0, -1}
-	if HitSphere(sphere, 0.5, r) {
-		return Color{1, 0, 0}
+	t := HitSphere(Point3{0, 0, -1}, 0.5, r)
+	if t > 0 {
+		n := Vec3(r.At(t)).Sub(Vec3{0, 0, -1}).UnitVec()
+		return Color(n.Add(Vec3{1, 1, 1}).Scale(0.5))
 	}
 
 	// Background
