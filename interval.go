@@ -21,4 +21,3 @@ type interval struct {
 //
 // var Empty = interval{math.Inf(1), math.Inf(-1)}
 // var Universe = interval{math.Inf(-1), math.Inf(1)}
-
