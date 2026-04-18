@@ -1,7 +1,14 @@
 package main
 
-import "math"
+import (
+	"math"
+	"math/rand"
+)
 
-func deg_to_rad(deg float64) float64 {
+func DegToRad(deg float64) float64 {
 	return deg * math.Pi / 180.0
+}
+
+func RandFloatRange(min, max float64) float64 {
+	return min + (max-min)*rand.Float64()
 }
