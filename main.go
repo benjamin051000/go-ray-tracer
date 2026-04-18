@@ -11,7 +11,7 @@ import (
 
 func RayColor(r Ray, world Hittable) Color {
 	var rec HitRecord
-	if world.Hit(r, 0, math.Inf(1), &rec) {
+	if world.Hit(r, interval{0, math.Inf(1)}, &rec) {
 		return Color(rec.normal.Add(Vec3{1, 1, 1}).Scale(0.5))
 	}
 

@@ -7,7 +7,7 @@ type Sphere struct {
 	radius float64 // TODO constructor? book sets to max(0, val)
 }
 
-func (s Sphere) Hit(r Ray, r_tmin, r_tmax float64, rec *HitRecord) bool {
+func (s Sphere) Hit(r Ray, ray_t interval, rec *HitRecord) bool {
 	oc := Vec3(s.center).Sub(Vec3(r.origin))
 	a := r.dir.LenSquared()
 	h := Vec3(r.dir).Dot(oc)
@@ -21,9 +21,9 @@ func (s Sphere) Hit(r Ray, r_tmin, r_tmax float64, rec *HitRecord) bool {
 
 	// Find the nearest root that lies in the acceptable range.
 	root := (h - sqrtd) / a
-	if root <= r_tmin || root >= r_tmax {
+	if root <= ray_t.min || root >= ray_t.max {
 		root = (h + sqrtd) / a
-		if root <= r_tmin || root >= r_tmax {
+		if root <= ray_t.min || root >= ray_t.max {
 			return false
 		}
 	}
