@@ -6,7 +6,7 @@ type Vec3 struct {
 	x, y, z float64
 }
 
-type Point3 Vec3
+type Point3 = Vec3
 
 func (v Vec3) Add(vecs ...Vec3) Vec3 {
 	for _, vec := range vecs {

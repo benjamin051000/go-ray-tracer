@@ -5,7 +5,7 @@ import (
 	"image/color"
 )
 
-type Color Vec3
+type Color = Vec3
 
 // TODO what kind of synchronization might this require?
 func (c Color) Write(x, y int, img *image.RGBA) {

@@ -12,13 +12,13 @@ import (
 func RayColor(r Ray, world Hittable) Color {
 	var rec HitRecord
 	if world.Hit(r, interval{0, math.Inf(1)}, &rec) {
-		return Color(rec.normal.Add(Vec3{1, 1, 1}).Scale(0.5))
+		return rec.normal.Add(Vec3{1, 1, 1}).Scale(0.5)
 	}
 
 	// Background
 	unit_dir := r.dir.UnitVec()
 	a := 0.5 * (unit_dir.y + 1.0)
-	return Color(Vec3{1.0, 1.0, 1.0}.Scale(1.0 - a).Add(Vec3{0.5, 0.7, 1.0}.Scale(a)))
+	return Vec3{1.0, 1.0, 1.0}.Scale(1.0 - a).Add(Vec3{0.5, 0.7, 1.0}.Scale(a))
 }
 
 func main() {
