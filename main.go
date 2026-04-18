@@ -9,20 +9,6 @@ import (
 	"os"
 )
 
-func HitSphere(center Point3, radius float64, r Ray) float64 {
-	oc := Vec3(center).Sub(Vec3(r.origin))
-	a := r.dir.LenSquared()
-	h := Vec3(r.dir).Dot(oc)
-	c := oc.LenSquared() - radius*radius
-	discriminant := h*h - a*c
-
-	if discriminant < 0 {
-		return -1.0
-	}
-
-	return (h - math.Sqrt(discriminant)) / a
-}
-
 func RayColor(r Ray) Color {
 	t := HitSphere(Point3{0, 0, -1}, 0.5, r)
 	if t > 0 {
