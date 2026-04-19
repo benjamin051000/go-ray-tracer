@@ -81,7 +81,7 @@ func RayColor(r Ray, depth uint, world Hittable) Color {
 	var rec HitRecord
 	if world.Hit(r, interval{0.001, math.Inf(1)}, &rec) {
 		// return rec.normal.Add(Vec3{1, 1, 1}).Scale(0.5)
-		direction := RandomVecOnHemisphere(rec.normal)
+		direction := rec.normal.Add(RandomUnitVec3())
 		return RayColor(Ray{rec.p, direction}, depth-1, world).Scale(0.5)
 	}
 
