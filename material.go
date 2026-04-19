@@ -15,8 +15,8 @@ func (l lambertian) scatter(r_in Ray, rec HitRecord, attenuation *Color, scatter
 	}
 
 	// TODO should this just be a retval?
-	scattered = &Ray{rec.p, scatter_direction}
-	attenuation = &l.albedo
+	*scattered = Ray{rec.p, scatter_direction}
+	*attenuation = l.albedo
 	return true
 }
 
@@ -26,7 +26,7 @@ type metal struct {
 
 func (m metal) scatter(r_in Ray, rec HitRecord, attenuation *Color, scattered *Ray) bool {
 	reflected := r_in.dir.Reflect(rec.normal)
-	scattered = &Ray{rec.p, reflected}
-	attenuation = &m.albedo
+	*scattered = Ray{rec.p, reflected}
+	*attenuation = m.albedo
 	return true
 }
