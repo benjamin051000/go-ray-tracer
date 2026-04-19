@@ -13,9 +13,10 @@ type camera struct {
 	pixel_du, pixel_dv        Vec3
 	samples_per_pixel         uint
 	pixel_samples_scale       float64
+	max_depth                 uint
 }
 
-func NewCamera(aspect_ratio float64, image_width uint, samples_per_pixel uint) camera {
+func NewCamera(aspect_ratio float64, image_width uint, samples_per_pixel, max_depth uint) camera {
 	// Calculate image_height automatically (must be >=1)
 	image_height := max(1, uint(float64(image_width)/aspect_ratio))
 
@@ -36,7 +37,7 @@ func NewCamera(aspect_ratio float64, image_width uint, samples_per_pixel uint) c
 	pixel00_loc := viewport_upper_left.Add(pixel_du.Add(pixel_dv).Scale(0.5))
 
 	pixel_samples_scale := 1.0 / float64(samples_per_pixel)
-	return camera{aspect_ratio, image_width, uint(image_height), camera_center, pixel00_loc, pixel_du, pixel_dv, samples_per_pixel, pixel_samples_scale}
+	return camera{aspect_ratio, image_width, uint(image_height), camera_center, pixel00_loc, pixel_du, pixel_dv, samples_per_pixel, pixel_samples_scale, max_depth}
 
 }
 
@@ -50,7 +51,7 @@ func (c camera) Render(world HittableList) image.RGBA {
 
 			for range c.samples_per_pixel {
 				r := c.GetRay(row, col)
-				rc := RayColor(r, world)
+				rc := RayColor(r, c.max_depth, world)
 				pixel_color = pixel_color.Add(rc)
 			}
 
@@ -72,10 +73,16 @@ func (c camera) GetRay(row, col uint) Ray {
 	return Ray{ray_origin, ray_dir}
 }
 
-func RayColor(r Ray, world Hittable) Color {
+func RayColor(r Ray, depth uint, world Hittable) Color {
+	if depth == 0 {
+		return Color{0, 0, 0}
+	}
+
 	var rec HitRecord
 	if world.Hit(r, interval{0, math.Inf(1)}, &rec) {
-		return rec.normal.Add(Vec3{1, 1, 1}).Scale(0.5)
+		// return rec.normal.Add(Vec3{1, 1, 1}).Scale(0.5)
+		direction := RandomVecOnHemisphere(rec.normal)
+		return RayColor(Ray{rec.p, direction}, depth-1, world).Scale(0.5)
 	}
 
 	// Background

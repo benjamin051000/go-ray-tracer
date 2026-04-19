@@ -14,7 +14,12 @@ func main() {
 	world.objects = append(world.objects, Sphere{center: Point3{0, -100.5, -1}, radius: 100})
 
 	// aspect_ratio is ideal, due to maths/rounding, viewport ratio may be slightly diff. See 4.2
-	cam := NewCamera(16.0/9.0, 400, 100)
+	var aspect_ratio float64 = 16.0/9.0
+	var img_w uint = 400
+	var spp uint = 100
+	var max_depth uint = 50
+	cam := NewCamera(aspect_ratio, img_w, spp, max_depth)
+
 	img := cam.Render(world)
 
 	fmt.Printf("Image dim. %dx%d (%d pixels)\n", cam.image_width, cam.image_height, cam.image_width*cam.image_height)

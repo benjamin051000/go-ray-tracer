@@ -15,6 +15,35 @@ func SampleSquare() Vec3 {
 	return Vec3{rand.Float64() - 0.5, rand.Float64() + 0.5, 0}
 }
 
+func RandomVec3() Vec3 {
+	return Vec3{rand.Float64(), rand.Float64(), rand.Float64()}
+}
+
+func RandomVec3Range(min, max float64) Vec3 {
+	return Vec3{RandFloatRange(min, max), RandFloatRange(min, max), RandFloatRange(min, max)}
+}
+
+func RandomUnitVec3() Vec3 {
+	for {
+		p := RandomVec3Range(-1, 1)
+		lensq := p.LenSquared()
+		if 1e-160 < lensq && lensq <= 1 {
+			return p.Scale(1 / math.Sqrt(lensq))
+		}
+	}
+}
+
+func RandomVecOnHemisphere(normal Vec3) Vec3 {
+	on_unit_sphere := RandomUnitVec3()
+	if on_unit_sphere.Dot(normal) > 0 {
+		// In the same hemisphere as the normal.
+		return on_unit_sphere
+	}
+
+	// Not so. Flip it so it is.
+	return on_unit_sphere.Scale(-1)
+}
+
 func (v Vec3) Add(vecs ...Vec3) Vec3 {
 	for _, vec := range vecs {
 		v.x += vec.x
