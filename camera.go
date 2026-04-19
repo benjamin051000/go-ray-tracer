@@ -11,9 +11,11 @@ type camera struct {
 	image_width, image_height uint
 	center, pixel00_loc       Point3
 	pixel_du, pixel_dv        Vec3
+	samples_per_pixel         uint
+	pixel_samples_scale       float64
 }
 
-func NewCamera(aspect_ratio float64, image_width uint) camera {
+func NewCamera(aspect_ratio float64, image_width uint, samples_per_pixel uint) camera {
 	// Calculate image_height automatically (must be >=1)
 	image_height := max(1, uint(float64(image_width)/aspect_ratio))
 
@@ -33,7 +35,8 @@ func NewCamera(aspect_ratio float64, image_width uint) camera {
 	viewport_upper_left := Vec3(camera_center).Sub(Vec3{0, 0, focal_len}, viewport_u.Scale(0.5), viewport_v.Scale(0.5))
 	pixel00_loc := viewport_upper_left.Add(pixel_du.Add(pixel_dv).Scale(0.5))
 
-	return camera{aspect_ratio, image_width, uint(image_height), camera_center, pixel00_loc, pixel_du, pixel_dv}
+	pixel_samples_scale := 1.0 / float64(samples_per_pixel)
+	return camera{aspect_ratio, image_width, uint(image_height), camera_center, pixel00_loc, pixel_du, pixel_dv, samples_per_pixel, pixel_samples_scale}
 
 }
 
@@ -42,18 +45,31 @@ func (c camera) Render(world HittableList) image.RGBA {
 
 	for row := range c.image_height {
 		for col := range c.image_width {
-			pixel_center := c.pixel00_loc.Add(c.pixel_du.Scale(float64(col)), c.pixel_dv.Scale(float64(row)))
-			ray_direction := pixel_center.Sub(Vec3(c.center)) // technically doesn't need to be a unit vector
 
-			r := Ray{c.center, ray_direction}
-			pixel_color := RayColor(r, world)
+			var pixel_color Color
 
-			pixel_color.Write(col, row, img)
+			for range c.samples_per_pixel {
+				r := c.GetRay(row, col)
+				rc := RayColor(r, world)
+				pixel_color = pixel_color.Add(rc)
+			}
+
+			pixel_color.Scale(c.pixel_samples_scale).Write(col, row, img)
 		}
 		fmt.Printf("%d/%d\n", row, c.image_height)
 	}
 
 	return *img
+}
+
+func (c camera) GetRay(row, col uint) Ray {
+	offset := SampleSquare()
+	pixel_sample := c.pixel00_loc.Add(c.pixel_du.Scale(float64(col)+offset.x), c.pixel_dv.Scale(float64(row)+offset.y))
+
+	ray_origin := c.center
+	ray_dir := pixel_sample.Sub(ray_origin)
+
+	return Ray{ray_origin, ray_dir}
 }
 
 func RayColor(r Ray, world Hittable) Color {

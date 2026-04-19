@@ -1,12 +1,19 @@
 package main
 
-import "math"
+import (
+	"math"
+	"math/rand"
+)
 
 type Vec3 struct {
 	x, y, z float64
 }
 
 type Point3 = Vec3
+
+func SampleSquare() Vec3 {
+	return Vec3{rand.Float64() - 0.5, rand.Float64() + 0.5, 0}
+}
 
 func (v Vec3) Add(vecs ...Vec3) Vec3 {
 	for _, vec := range vecs {
