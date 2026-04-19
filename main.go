@@ -11,8 +11,8 @@ func main() {
 	// Materials
 	mat_ground := lambertian{Color{0.8, 0.8, 0.0}}
 	mat_center := lambertian{Color{0.1, 0.2, 0.5}}
-	mat_left := metal{Color{0.8, 0.8, 0.8}}
-	mat_right := metal{Color{0.8, 0.6, 0.2}}
+	mat_left := metal{Color{0.8, 0.8, 0.8}, 0.3}
+	mat_right := metal{Color{0.8, 0.6, 0.2}, 1.0}
 
 	// World
 	var world HittableList

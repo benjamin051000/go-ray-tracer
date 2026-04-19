@@ -22,11 +22,13 @@ func (l lambertian) scatter(r_in Ray, rec HitRecord, attenuation *Color, scatter
 
 type metal struct {
 	albedo Color
+	fuzz float64
 }
 
 func (m metal) scatter(r_in Ray, rec HitRecord, attenuation *Color, scattered *Ray) bool {
 	reflected := r_in.dir.Reflect(rec.normal)
+	reflected = reflected.UnitVec().Add(RandomUnitVec3().Scale(m.fuzz))
 	*scattered = Ray{rec.p, reflected}
 	*attenuation = m.albedo
-	return true
+	return scattered.dir.Dot(rec.normal) > 0
 }
