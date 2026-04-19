@@ -24,4 +24,3 @@ func (c Color) Write(x, y uint, img *image.RGBA) {
 	b := uint8(256 * intensity.Clamp(ToGamma(c.z)))
 	img.Set(int(x), int(y), color.RGBA{r, g, b, 255})
 }
-

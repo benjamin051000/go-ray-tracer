@@ -44,6 +44,11 @@ func RandomVecOnHemisphere(normal Vec3) Vec3 {
 	return on_unit_sphere.Scale(-1)
 }
 
+func (v Vec3) NearZero() bool {
+	const s = 1e-8
+	return math.Abs(v.x) < s && math.Abs(v.y) < s && math.Abs(v.z) < s
+}
+
 func (v Vec3) Add(vecs ...Vec3) Vec3 {
 	for _, vec := range vecs {
 		v.x += vec.x
@@ -110,4 +115,9 @@ func (v Vec3) Cross(other Vec3) Vec3 {
 func (v Vec3) UnitVec() Vec3 {
 	l := v.Len()
 	return v.Div(Vec3{l, l, l})
+}
+
+func (v Vec3) Reflect(n Vec3) Vec3 {
+	b := v.Dot(n)
+	return v.Sub(n.Scale(2 * b))
 }

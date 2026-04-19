@@ -3,6 +3,7 @@ package main
 type HitRecord struct {
 	p          Point3
 	normal     Vec3
+	mat        material
 	t          float64
 	front_face bool
 }

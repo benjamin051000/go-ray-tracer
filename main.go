@@ -8,13 +8,23 @@ import (
 )
 
 func main() {
+	// Materials
+	mat_ground := lambertian{Color{0.8, 0.8, 0.0}}
+	mat_center := lambertian{Color{0.1, 0.2, 0.5}}
+	mat_left := metal{Color{0.8, 0.8, 0.8}}
+	mat_right := metal{Color{0.8, 0.6, 0.2}}
+
 	// World
 	var world HittableList
-	world.objects = append(world.objects, Sphere{center: Point3{0, 0, -1}, radius: 0.5})
-	world.objects = append(world.objects, Sphere{center: Point3{0, -100.5, -1}, radius: 100})
+	// world.objects = append(world.objects, Sphere{center: Point3{0, 0, -1}, radius: 0.5})
+	// world.objects = append(world.objects, Sphere{center: Point3{0, -100.5, -1}, radius: 100})
+	world.objects = append(world.objects, Sphere{center: Point3{0, -100.5, -1}, radius: 100.0, mat: mat_ground})
+	world.objects = append(world.objects, Sphere{Point3{0, 0, -1.2}, 0.5, mat_center})
+	world.objects = append(world.objects, Sphere{Point3{-1, 0, 1}, 0.5, mat_left})
+	world.objects = append(world.objects, Sphere{Point3{-1, 0, -1}, 0.5, mat_right})
 
 	// aspect_ratio is ideal, due to maths/rounding, viewport ratio may be slightly diff. See 4.2
-	var aspect_ratio float64 = 16.0/9.0
+	var aspect_ratio float64 = 16.0 / 9.0
 	var img_w uint = 400
 	var spp uint = 100
 	var max_depth uint = 50

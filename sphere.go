@@ -5,6 +5,7 @@ import "math"
 type Sphere struct {
 	center Point3
 	radius float64 // TODO constructor? book sets to max(0, val)
+	mat    material
 }
 
 func (s Sphere) Hit(r Ray, ray_t interval, rec *HitRecord) bool {
@@ -30,6 +31,7 @@ func (s Sphere) Hit(r Ray, ray_t interval, rec *HitRecord) bool {
 
 	rec.t = root
 	rec.p = r.At(rec.t)
+	rec.mat = s.mat
 	outward_normal := Vec3(rec.p).Sub(Vec3(s.center)).Scale(1 / s.radius)
 	rec.SetFaceNormal(r, outward_normal)
 
