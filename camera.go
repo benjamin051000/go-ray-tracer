@@ -14,17 +14,21 @@ type camera struct {
 	samples_per_pixel         uint
 	pixel_samples_scale       float64
 	max_depth                 uint
+	vfov                      float64
 }
 
-func NewCamera(aspect_ratio float64, image_width uint, samples_per_pixel, max_depth uint) camera {
+func NewCamera(aspect_ratio float64, image_width uint, samples_per_pixel, max_depth uint, vfov float64) camera {
 	// Calculate image_height automatically (must be >=1)
 	image_height := max(1, uint(float64(image_width)/aspect_ratio))
 
 	// Viewport widths less than one are ok since they are real valued.
-	viewport_h := 2.0
-	viewport_w := viewport_h * float64(image_width) / float64(image_height)
-	focal_len := 1.0
 	camera_center := Point3{0, 0, 0}
+
+	focal_len := 1.0
+	theta := DegToRad(vfov)
+	h := math.Tan(theta / 2)
+	viewport_h := 2 * h * focal_len
+	viewport_w := viewport_h * float64(image_width) / float64(image_height)
 
 	// Define the viewport as vectors
 	viewport_u := Vec3{viewport_w, 0, 0}
@@ -37,7 +41,7 @@ func NewCamera(aspect_ratio float64, image_width uint, samples_per_pixel, max_de
 	pixel00_loc := viewport_upper_left.Add(pixel_du.Add(pixel_dv).Scale(0.5))
 
 	pixel_samples_scale := 1.0 / float64(samples_per_pixel)
-	return camera{aspect_ratio, image_width, uint(image_height), camera_center, pixel00_loc, pixel_du, pixel_dv, samples_per_pixel, pixel_samples_scale, max_depth}
+	return camera{aspect_ratio, image_width, uint(image_height), camera_center, pixel00_loc, pixel_du, pixel_dv, samples_per_pixel, pixel_samples_scale, max_depth, vfov}
 
 }
 

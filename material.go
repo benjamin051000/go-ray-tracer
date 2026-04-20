@@ -55,7 +55,7 @@ func (d dielectric) scatter(r_in Ray, rec HitRecord, attenuation *Color, scatter
 	cos_theta := min(unit_dir.Scale(-1).Dot(rec.normal), 1.0)
 	sin_theta := math.Sqrt(1.0 - cos_theta*cos_theta)
 
-	cannot_refract := ri * sin_theta > 1.0
+	cannot_refract := ri*sin_theta > 1.0
 
 	var direction Vec3
 	if cannot_refract || reflectance(cos_theta, ri) > rand.Float64() {
@@ -64,7 +64,6 @@ func (d dielectric) scatter(r_in Ray, rec HitRecord, attenuation *Color, scatter
 		direction = unit_dir.Refract(rec.normal, ri)
 	}
 
-
 	*scattered = Ray{rec.p, direction}
 	return true
 }
@@ -72,6 +71,6 @@ func (d dielectric) scatter(r_in Ray, rec HitRecord, attenuation *Color, scatter
 // reflectance calculated via Schlick's approximation.
 func reflectance(cosine, refraction_index float64) float64 {
 	r0 := (1 - refraction_index) / (1 + refraction_index)
-	r0 = r0*r0
-	return r0 + (1-r0) * math.Pow((1 - cosine), 5)
+	r0 = r0 * r0
+	return r0 + (1-r0)*math.Pow((1-cosine), 5)
 }
