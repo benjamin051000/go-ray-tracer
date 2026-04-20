@@ -121,3 +121,11 @@ func (v Vec3) Reflect(n Vec3) Vec3 {
 	b := v.Dot(n)
 	return v.Sub(n.Scale(2 * b))
 }
+
+func (v Vec3) Refract(n Vec3, etai_over_etat float64) Vec3 {
+	cos_theta := min(v.Scale(-1).Dot(n), 1.0)
+	r_out_perp := v.Add(n.Scale(cos_theta)).Scale(etai_over_etat)
+	r_out_parallel := n.Scale(-1 * math.Sqrt(math.Abs(1.0-r_out_perp.LenSquared())))
+
+	return r_out_perp.Add(r_out_parallel)
+}

@@ -11,7 +11,7 @@ func main() {
 	// Materials
 	mat_ground := lambertian{Color{0.8, 0.8, 0.0}}
 	mat_center := lambertian{Color{0.1, 0.2, 0.5}}
-	mat_left := metal{Color{0.8, 0.8, 0.8}, 0.3}
+	mat_left := dielectric{refraction_index: 1.50}
 	mat_right := metal{Color{0.8, 0.6, 0.2}, 1.0}
 
 	// World

@@ -22,7 +22,7 @@ func (l lambertian) scatter(r_in Ray, rec HitRecord, attenuation *Color, scatter
 
 type metal struct {
 	albedo Color
-	fuzz float64
+	fuzz   float64
 }
 
 func (m metal) scatter(r_in Ray, rec HitRecord, attenuation *Color, scattered *Ray) bool {
@@ -31,4 +31,24 @@ func (m metal) scatter(r_in Ray, rec HitRecord, attenuation *Color, scattered *R
 	*scattered = Ray{rec.p, reflected}
 	*attenuation = m.albedo
 	return scattered.dir.Dot(rec.normal) > 0
+}
+
+type dielectric struct {
+	refraction_index float64
+}
+
+func (d dielectric) scatter(r_in Ray, rec HitRecord, attenuation *Color, scattered *Ray) bool {
+	*attenuation = Color{1, 1, 1}
+	var ri float64
+	if rec.front_face {
+		ri = 1.0 / d.refraction_index
+	} else {
+		ri = d.refraction_index
+	}
+
+	unit_dir := r_in.dir.UnitVec()
+	refracted := unit_dir.Refract(rec.normal, ri)
+
+	*scattered = Ray{rec.p, refracted}
+	return true
 }
