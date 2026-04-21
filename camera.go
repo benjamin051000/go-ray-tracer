@@ -15,33 +15,40 @@ type camera struct {
 	pixel_samples_scale       float64
 	max_depth                 uint
 	vfov                      float64
+	lookfrom, lookat          Point3
+	vup, u, v, w              Vec3
 }
 
-func NewCamera(aspect_ratio float64, image_width uint, samples_per_pixel, max_depth uint, vfov float64) camera {
+func NewCamera(aspect_ratio float64, image_width uint, samples_per_pixel, max_depth uint, vfov float64, lookfrom, lookat Point3, vup Vec3) camera {
 	// Calculate image_height automatically (must be >=1)
 	image_height := max(1, uint(float64(image_width)/aspect_ratio))
 
 	// Viewport widths less than one are ok since they are real valued.
-	camera_center := Point3{0, 0, 0}
+	center := lookfrom
 
-	focal_len := 1.0
+	focal_len := lookfrom.Sub(lookat).Len()
 	theta := DegToRad(vfov)
 	h := math.Tan(theta / 2)
 	viewport_h := 2 * h * focal_len
 	viewport_w := viewport_h * float64(image_width) / float64(image_height)
 
+	w := lookfrom.Sub(lookat).UnitVec()
+	u := vup.Cross(w).UnitVec()
+	v := w.Cross(u)
+
 	// Define the viewport as vectors
-	viewport_u := Vec3{viewport_w, 0, 0}
-	viewport_v := Vec3{0, -viewport_h, 0}
+	viewport_u := u.Scale(viewport_w)
+	viewport_v := v.Scale(-viewport_h)
 
 	pixel_du := viewport_u.Scale(1.0 / float64(image_width))
 	pixel_dv := viewport_v.Scale(1.0 / float64(image_height))
 
-	viewport_upper_left := Vec3(camera_center).Sub(Vec3{0, 0, focal_len}, viewport_u.Scale(0.5), viewport_v.Scale(0.5))
+	// viewport_upper_left := Vec3(camera_center).Sub(Vec3{0, 0, focal_len}, viewport_u.Scale(0.5), viewport_v.Scale(0.5))
+	viewport_upper_left := center.Sub(w.Scale(focal_len), viewport_u.Scale(0.5), viewport_v.Scale(0.5))
 	pixel00_loc := viewport_upper_left.Add(pixel_du.Add(pixel_dv).Scale(0.5))
 
 	pixel_samples_scale := 1.0 / float64(samples_per_pixel)
-	return camera{aspect_ratio, image_width, uint(image_height), camera_center, pixel00_loc, pixel_du, pixel_dv, samples_per_pixel, pixel_samples_scale, max_depth, vfov}
+	return camera{aspect_ratio, image_width, uint(image_height), center, pixel00_loc, pixel_du, pixel_dv, samples_per_pixel, pixel_samples_scale, max_depth, vfov, lookfrom, lookat, vup, u, v, w}
 
 }
 
