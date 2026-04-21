@@ -17,19 +17,21 @@ type camera struct {
 	vfov                      float64
 	lookfrom, lookat          Point3
 	vup, u, v, w              Vec3
+	defocus_angle, focus_dist float64
+	defocus_disk_u            Vec3
+	defocus_disk_v            Vec3
 }
 
-func NewCamera(aspect_ratio float64, image_width uint, samples_per_pixel, max_depth uint, vfov float64, lookfrom, lookat Point3, vup Vec3) camera {
+func NewCamera(aspect_ratio float64, image_width uint, samples_per_pixel, max_depth uint, vfov float64, lookfrom, lookat Point3, vup Vec3, focus_dist, defocus_angle float64) camera {
 	// Calculate image_height automatically (must be >=1)
 	image_height := max(1, uint(float64(image_width)/aspect_ratio))
 
 	// Viewport widths less than one are ok since they are real valued.
 	center := lookfrom
 
-	focal_len := lookfrom.Sub(lookat).Len()
 	theta := DegToRad(vfov)
 	h := math.Tan(theta / 2)
-	viewport_h := 2 * h * focal_len
+	viewport_h := 2 * h * focus_dist
 	viewport_w := viewport_h * float64(image_width) / float64(image_height)
 
 	w := lookfrom.Sub(lookat).UnitVec()
@@ -43,12 +45,14 @@ func NewCamera(aspect_ratio float64, image_width uint, samples_per_pixel, max_de
 	pixel_du := viewport_u.Scale(1.0 / float64(image_width))
 	pixel_dv := viewport_v.Scale(1.0 / float64(image_height))
 
-	// viewport_upper_left := Vec3(camera_center).Sub(Vec3{0, 0, focal_len}, viewport_u.Scale(0.5), viewport_v.Scale(0.5))
-	viewport_upper_left := center.Sub(w.Scale(focal_len), viewport_u.Scale(0.5), viewport_v.Scale(0.5))
+	viewport_upper_left := center.Sub(w.Scale(focus_dist), viewport_u.Scale(0.5), viewport_v.Scale(0.5))
 	pixel00_loc := viewport_upper_left.Add(pixel_du.Add(pixel_dv).Scale(0.5))
+	defocus_radius := focus_dist * math.Tan(DegToRad(defocus_angle / 2.0))
+	defocus_disk_u := u.Scale(defocus_radius)
+	defocus_disk_v := v.Scale(defocus_radius)
 
 	pixel_samples_scale := 1.0 / float64(samples_per_pixel)
-	return camera{aspect_ratio, image_width, uint(image_height), center, pixel00_loc, pixel_du, pixel_dv, samples_per_pixel, pixel_samples_scale, max_depth, vfov, lookfrom, lookat, vup, u, v, w}
+	return camera{aspect_ratio, image_width, uint(image_height), center, pixel00_loc, pixel_du, pixel_dv, samples_per_pixel, pixel_samples_scale, max_depth, vfov, lookfrom, lookat, vup, u, v, w, defocus_angle, focus_dist, defocus_disk_u, defocus_disk_v}
 
 }
 
@@ -78,10 +82,20 @@ func (c camera) GetRay(row, col uint) Ray {
 	offset := SampleSquare()
 	pixel_sample := c.pixel00_loc.Add(c.pixel_du.Scale(float64(col)+offset.x), c.pixel_dv.Scale(float64(row)+offset.y))
 
-	ray_origin := c.center
+	var ray_origin Point3
+	if c.defocus_angle <= 0 {
+		ray_origin = c.center
+	} else {
+		ray_origin = c.DefocusDiskSample()
+	}
 	ray_dir := pixel_sample.Sub(ray_origin)
 
 	return Ray{ray_origin, ray_dir}
+}
+
+func (c camera) DefocusDiskSample() Point3 {
+	p := RandomVecInUnitDisk()
+	return c.center.Add(c.defocus_disk_u.Scale(p.x), c.defocus_disk_v.Scale(p.y))
 }
 
 func RayColor(r Ray, depth uint, world Hittable) Color {

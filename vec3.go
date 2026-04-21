@@ -44,6 +44,15 @@ func RandomVecOnHemisphere(normal Vec3) Vec3 {
 	return on_unit_sphere.Scale(-1)
 }
 
+func RandomVecInUnitDisk() Vec3 {
+	for {
+		p := Vec3{RandFloatRange(-1, 1), RandFloatRange(-1, 1), 0}
+		if p.LenSquared() < 1 {
+			return p
+		}
+	}
+}
+
 func (v Vec3) NearZero() bool {
 	const s = 1e-8
 	return math.Abs(v.x) < s && math.Abs(v.y) < s && math.Abs(v.z) < s

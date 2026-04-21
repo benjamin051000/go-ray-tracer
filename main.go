@@ -28,10 +28,14 @@ func main() {
 	var img_w uint = 400
 	var spp uint = 100
 	var max_depth uint = 50
+
 	var vfov float64 = 20
 	var lookfrom, lookat Point3 = Point3{-2, 2, 1}, Point3{0, 0, -1}
 	var vup Vec3 = Vec3{0, 1, 0}
-	cam := NewCamera(aspect_ratio, img_w, spp, max_depth, vfov, lookfrom, lookat, vup)
+	var defocus_angle float64 = 10.0 
+	var focus_dist = 3.4
+
+	cam := NewCamera(aspect_ratio, img_w, spp, max_depth, vfov, lookfrom, lookat, vup, focus_dist, defocus_angle)
 
 	img := cam.Render(world)
 
