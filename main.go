@@ -6,6 +6,8 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"runtime"
+	"time"
 )
 
 func create_world() HittableList {
@@ -61,7 +63,7 @@ func main() {
 	// aspect_ratio is ideal, due to maths/rounding, viewport ratio may be slightly diff. See 4.2
 	var aspect_ratio float64 = 16.0 / 9.0
 	var img_w uint = 1200
-	var spp uint = 10
+	var spp uint = 100
 	var max_depth uint = 50
 
 	var vfov float64 = 20
@@ -69,10 +71,15 @@ func main() {
 	var vup Vec3 = Vec3{0, 1, 0}
 	var defocus_angle float64 = 0.6
 	var focus_dist = 10.0
+	var num_jobs = uint(runtime.GOMAXPROCS(0))
 
 	cam := NewCamera(aspect_ratio, img_w, spp, max_depth, vfov, lookfrom, lookat, vup, focus_dist, defocus_angle)
 
-	img := cam.Render(world)
+	start := time.Now()
+	img := cam.Render(world, num_jobs)
+
+	elapsed := time.Since(start)
+	fmt.Printf("Total time: %s\n", elapsed)
 
 	fmt.Printf("Image dim. %dx%d (%d pixels)\n", cam.image_width, cam.image_height, cam.image_width*cam.image_height)
 

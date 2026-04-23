@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"image"
 	"math"
+	"sync"
+	"sync/atomic"
+	"time"
 )
 
 type camera struct {
@@ -56,25 +59,40 @@ func NewCamera(aspect_ratio float64, image_width uint, samples_per_pixel, max_de
 
 }
 
-func (c camera) Render(world HittableList) image.RGBA {
+func (c camera) Render(world HittableList, num_jobs uint) image.RGBA {
 	img := image.NewRGBA(image.Rect(0, 0, int(c.image_width), int(c.image_height)))
 
+	type job struct{ row, col uint }
+	jobs := make(chan job, c.image_width*c.image_height)
+
+	// Fill job queue
 	for row := range c.image_height {
 		for col := range c.image_width {
-
-			var pixel_color Color
-
-			for range c.samples_per_pixel {
-				r := c.GetRay(row, col)
-				rc := RayColor(r, c.max_depth, world)
-				pixel_color = pixel_color.Add(rc)
-			}
-
-			pixel_color.Scale(c.pixel_samples_scale).Write(col, row, img)
+			jobs <- job{row, col}
 		}
-		fmt.Printf("%d/%d\n", row, c.image_height)
+	}
+	close(jobs)
+
+	var wg sync.WaitGroup
+
+
+	start := time.Now()
+
+	for range num_jobs {
+		wg.Go(func() {
+			// Easy way to pop a new job off the stack!
+			for j := range jobs {
+				var pixel_color Color
+				for range c.samples_per_pixel {
+					r := c.GetRay(j.row, j.col)
+					pixel_color = pixel_color.Add(RayColor(r, c.max_depth, world))
+				}
+				pixel_color.Scale(c.pixel_samples_scale).Write(j.col, j.row, img)
+			}
+		})
 	}
 
+	wg.Wait()
 	return *img
 }
 
