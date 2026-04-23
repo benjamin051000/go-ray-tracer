@@ -75,6 +75,7 @@ func (c camera) Render(world HittableList, num_jobs uint) image.RGBA {
 
 	var wg sync.WaitGroup
 
+	var completed_pix atomic.Uint64
 
 	start := time.Now()
 
@@ -88,9 +89,28 @@ func (c camera) Render(world HittableList, num_jobs uint) image.RGBA {
 					pixel_color = pixel_color.Add(RayColor(r, c.max_depth, world))
 				}
 				pixel_color.Scale(c.pixel_samples_scale).Write(j.col, j.row, img)
+				completed_pix.Add(1)
 			}
 		})
 	}
+
+	// A goroutine to monitor progress
+	wg.Go(func() {
+		total := uint64(c.image_width * c.image_height)
+
+		for {
+			done := completed_pix.Load()
+			dt := time.Since(start)
+			percent := float64(done) / float64(total) * 100.00
+			pix_per_sec := float64(done) / float64(dt.Seconds())
+			fmt.Printf("\r%5.1f%% | %s elapsed | %.0f pix/sec", percent, dt.Round(time.Second), pix_per_sec)
+			if done >= total {
+				fmt.Println()
+				return
+			}
+			time.Sleep(100 * time.Millisecond)
+		}
+	})
 
 	wg.Wait()
 	return *img
