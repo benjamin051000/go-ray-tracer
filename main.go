@@ -75,13 +75,16 @@ func main() {
 
 	cam := NewCamera(aspect_ratio, img_w, spp, max_depth, vfov, lookfrom, lookat, vup, focus_dist, defocus_angle)
 
+	fmt.Printf("Image dimensions: %dx%d (%fM pixels)\n", cam.image_width, cam.image_height, float64(cam.image_width*cam.image_height)/1_000_000.0)
+	fmt.Printf("%d samples per pixel (%fM total rays)\n", spp, float64(spp*cam.image_width*cam.image_height)/1_000_000.0)
+	fmt.Printf("World size: %d spheres\n", len(world.objects))
+	fmt.Printf("Starting %d jobs...\n", num_jobs)
+
 	start := time.Now()
 	img := cam.Render(world, num_jobs)
 
 	elapsed := time.Since(start)
 	fmt.Printf("Total time: %s\n", elapsed)
-
-	fmt.Printf("Image dim. %dx%d (%d pixels)\n", cam.image_width, cam.image_height, cam.image_width*cam.image_height)
 
 	file, err := os.Create("out.png")
 	if err != nil {
