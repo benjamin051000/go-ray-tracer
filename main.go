@@ -10,13 +10,13 @@ import (
 
 func create_world() HittableList {
 	var world HittableList
-	
+
 	mat_ground := lambertian{Color{0.5, 0.5, 0.5}}
 	world.objects = append(world.objects, Sphere{Point3{0, -1000, 0}, 1000, mat_ground})
 
-	for a := -11.0; a < 11.0; a+=1.0 {
-		for b := -11.0; b < 11.0; b+=1.0 {
-			center := Point3{a + 0.9 * rand.Float64(), 0.2, b + 0.9 * rand.Float64()}
+	for a := -11.0; a < 11.0; a += 1.0 {
+		for b := -11.0; b < 11.0; b += 1.0 {
+			center := Point3{a + 0.9*rand.Float64(), 0.2, b + 0.9*rand.Float64()}
 
 			if center.Sub(Point3{4, 0.2, 0}).Len() > 0.9 {
 				choose_mat := rand.Float64()
@@ -27,13 +27,13 @@ func create_world() HittableList {
 					albedo := Color(RandomVec3().Mul(RandomVec3()))
 					sphere_mat := lambertian{albedo}
 					world.objects = append(world.objects, Sphere{center, 0.2, sphere_mat})
-				} else if (choose_mat < 0.95) {
+				} else if choose_mat < 0.95 {
 					// metal
 					albedo := Color(RandomVec3Range(0.5, 1))
 					fuzz := RandFloatRange(0, 0.5)
 					sphere_mat := metal{albedo, fuzz}
 					world.objects = append(world.objects, Sphere{center, 0.2, sphere_mat})
-					
+
 				} else {
 					// glass
 					sphere_mat := dielectric{1.5}
@@ -67,7 +67,7 @@ func main() {
 	var vfov float64 = 20
 	var lookfrom, lookat Point3 = Point3{13, 2, 3}, Point3{0, 0, 0}
 	var vup Vec3 = Vec3{0, 1, 0}
-	var defocus_angle float64 = 0.6 
+	var defocus_angle float64 = 0.6
 	var focus_dist = 10.0
 
 	cam := NewCamera(aspect_ratio, img_w, spp, max_depth, vfov, lookfrom, lookat, vup, focus_dist, defocus_angle)

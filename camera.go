@@ -47,7 +47,7 @@ func NewCamera(aspect_ratio float64, image_width uint, samples_per_pixel, max_de
 
 	viewport_upper_left := center.Sub(w.Scale(focus_dist), viewport_u.Scale(0.5), viewport_v.Scale(0.5))
 	pixel00_loc := viewport_upper_left.Add(pixel_du.Add(pixel_dv).Scale(0.5))
-	defocus_radius := focus_dist * math.Tan(DegToRad(defocus_angle / 2.0))
+	defocus_radius := focus_dist * math.Tan(DegToRad(defocus_angle/2.0))
 	defocus_disk_u := u.Scale(defocus_radius)
 	defocus_disk_v := v.Scale(defocus_radius)
 
